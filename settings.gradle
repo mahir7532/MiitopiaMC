@@ -1,0 +1,94 @@
+plugins {
+    id 'java'
+    id 'net.minecraftforge.gradle.forge' version '6.2.2'
+}
+
+group = 'com.example'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    withSourcesJar()
+}
+
+println "Java: ${System.getProperty('java.version')}"
+
+minecraft {
+    mappings channel: 'official', version: '1.21.1'
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            programArgument '--mixin'
+            jvmArgument '-Dmixin.env.remapRefMap=true'
+            jvmArgument '-Dmixin.env.refMapName=mixin.client.refmap.json'
+            mods {
+                miitopiamiichara {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            programArgument '--mixin'
+            jvmArgument '-Dmixin.env.remapRefMap=true'
+            jvmArgument '-Dmixin.env.refMapName=mixin.refmap.json'
+            mods {
+                miitopiamiichara {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+            programArgument '--mixin'
+            jvmArgument '-Dmixin.env.remapRefMap=true'
+            jvmArgument '-Dmixin.env.refMapName=mixin.refmap.json'
+            args '--mod', 'miitopiamiichara', '--all', '--output', file('src/main/generated')
+            mods {
+                miitopiamiichara {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    maven {
+        name = "MinecraftForge"
+        url = "https://maven.minecraftforge.net/"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:1.21.1-49.0.95:userdev"
+    implementation "org.jetbrains:annotations:23.0.0"
+}
+
+jar {
+    manifest {
+        attributes([
+                'Specification-Title'     : 'miitopiamiichara',
+                'Specification-Vendor'    : 'example.com',
+                'Specification-Version'   : '1', // We are version 1 of ourselves
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : 'example.com',
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+    finalizedBy 'reobfJar'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 encoding for Java compilation
+}
+
+// Example how to reobfuscate datafixers:
+//runData.jvmArgumentLine.append('-Dmixin.env.disableRefMap=true')
+```
